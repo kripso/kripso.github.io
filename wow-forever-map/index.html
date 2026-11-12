@@ -165,6 +165,49 @@ html.pz.phone #panel{max-height:calc(72dvh / var(--pz))!important}
 html.pz.phone #panel.full{height:calc(100dvh / var(--pz))!important;max-height:none!important}
 html.pz.phone #pop{max-height:calc(58dvh / var(--pz))}
 html.pz #chainbar{max-width:calc((100vw - 70px * var(--pz)) / var(--pz))}
+/* ===== v10: compact touch chrome (phones + tablets, portrait + landscape). html.touch is set in JS:
+   coarse pointer, OR effective width <700, OR effective height <=500 — so landscape phones never get desktop chrome. */
+html.touch{--chip:rgba(22,16,10,.72);--chipb:rgba(201,164,92,.35);--chiph:36px}
+html.touch #bar{left:calc(8px + var(--sal));right:auto;top:calc(6px + var(--sat));max-width:calc(100% - 16px - var(--sal) - var(--sar));
+ flex-wrap:nowrap!important;overflow:visible;gap:4px;align-items:center;padding:3px!important;border-radius:12px;border:1px solid var(--chipb);
+ background:var(--chip);-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);box-shadow:0 2px 12px rgba(0,0,0,.45)}
+html.touch #bar h1{display:none!important}
+html.touch #bar #sbtn{display:flex!important;align-items:center;justify-content:center;width:var(--chiph);height:var(--chiph);min-width:0;min-height:0!important;max-width:none;padding:0;
+ border:0;border-radius:9px;background:rgba(255,215,122,.14);color:#ffd77a;font:700 19px/1 'FMNum',sans-serif}
+html.touch #bar #sbtn .lab{display:none}
+html.touch #bar #city{flex:0 1 auto!important;width:auto;min-width:96px;max-width:min(46vw,210px)!important;height:var(--chiph);min-height:0!important;
+ font:600 16px/1.1 'FMNum',sans-serif!important;padding:0 24px 0 10px!important;border:0;border-radius:9px;background:rgba(255,255,255,.07);color:#f3e7c9;text-overflow:ellipsis}
+html.touch #bar .tbtn:not(#sbtn){height:var(--chiph);min-height:0!important;padding:0 8px!important;font-size:13px!important;border-radius:9px;border:0;background:rgba(255,255,255,.07)}
+html.touch #bar .tbtn.on:not(#sbtn){background:#ffd77a;color:#1b1108}
+html.touch #bar .lvl{display:flex!important;align-items:center;margin:0}
+html.touch #bar .lvl .t{display:none!important}
+html.touch #bar #lv{width:46px!important;height:var(--chiph)!important;min-height:0!important;padding:0 4px!important;text-align:center;border:0;border-radius:9px;
+ background:rgba(255,255,255,.07);color:#ffd77a;font:700 16px/1 'FMNum',sans-serif!important;-moz-appearance:textfield;appearance:textfield}
+html.touch #bar #lv::-webkit-outer-spin-button,html.touch #bar #lv::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+html.touch #bar #lv::placeholder{color:#b9a47c;opacity:.9;font-weight:600}
+html.touch #bar button,html.touch #bar select,html.touch #bar input{position:relative}
+/* map controls: slim icon stack, 38px visible, 44px hit area via ::after */
+html.touch #fabs{flex-direction:column!important;flex-wrap:nowrap!important;gap:0!important;right:calc(8px + var(--sar))!important;bottom:calc(12px + var(--sab))!important;width:auto}
+html.touch #fabs button{position:relative;width:38px!important;height:38px!important;border:1px solid var(--chipb);border-radius:0;background:var(--chip);
+ -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#f3e7c9;font:600 19px/1 'FMNum',sans-serif;box-shadow:none;flex-direction:row}
+html.touch #fabs button::after{content:'';position:absolute;inset:-3px}
+html.touch #fabs #fbtn{border-radius:10px;margin-bottom:8px;background:var(--chip);color:#ffd77a;font-size:20px;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+html.touch #fabs #fbtn span{display:none}
+html.touch #fabs #fbtn.on,html.touch #panel.open~#fabs #fbtn{background:rgba(255,215,122,.9);color:#1b1108}
+html.touch #fabs #zin{border-radius:10px 10px 0 0;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+html.touch #fabs #zout{border-top:0;border-bottom:0}
+html.touch #fabs #fit{border-radius:0 0 10px 10px;font-size:16px}
+html.touch #chainbar{font-size:13px;padding:4px 6px 4px 10px;border-radius:10px}
+html.touch #zoomhint{font-size:13px;padding:6px 8px;right:calc(56px + var(--sar))}
+/* bottom sheet / side sheet keep their geometry; only tone down the chrome */
+html.touch #panel{font-size:14px}
+html.touch #panel .ph .x,html.touch #pop .ph .x{min-width:40px;min-height:40px}
+html.touch #bar .lvl:before{display:none!important;content:none}
+html.touch #bar .lvl{gap:0;font-size:0}
+html.touch #bar #city{-webkit-appearance:none;appearance:none;background-color:rgba(255,255,255,.07);color:#f3e7c9;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23ffd77a' stroke-width='1.6'/%3E%3C/svg%3E");
+ background-repeat:no-repeat;background-position:right 9px center;background-size:10px 6px}
+html.touch #bar #city option{background:#2a1f14;color:#f3e7c9}
 
 /* forced phone layout (page zoom) */
 html.phone #bar{gap:5px 6px}html.phone #bar h1{font-size:13px;width:100%}html.phone .tabs button{padding:4px 8px;font-size:13px}html.phone .lvl .t{display:none}html.phone .lvl:before{content:'Lv';font-size:13px}html.phone input[type=number]{width:46px}html.phone #panel{left:0;right:0;bottom:0;top:auto!important;width:auto;max-width:none;max-height:72vh!important;border-radius:16px 16px 0 0;border-width:1px 0 0;padding:0 calc(12px + var(--sar)) calc(14px + var(--sab)) calc(12px + var(--sal));display:block;transform:translateY(105%);transition:transform .22s ease}html.phone #panel.open{transform:none}html.phone .grab{display:block;width:44px;height:5px;border-radius:3px;background:#6b5130;margin:0 auto}html.phone #phead{flex-wrap:wrap}html.phone #pop{left:8px!important;right:8px;top:auto!important;bottom:calc(8px + var(--sab));width:auto;max-height:58vh}html.phone #tip{display:none!important}html.phone #city,html.phone .tbtn{font-size:13px;padding:4px 6px;max-width:118px}html.phone #bar{flex-wrap:nowrap;gap:6px;padding:calc(4px + var(--sat)) calc(8px + var(--sar)) 4px calc(8px + var(--sal))}html.phone #bar h1{display:none}html.phone #sbtn{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:20px;padding:0 10px;flex:none}html.phone #sbtn .lab{font-size:14px}html.phone #city{flex:1 1 auto;min-width:0;max-width:none;min-height:44px;font-size:16px!important}html.phone .tbtn{min-height:44px}html.phone input[type=number]{width:52px;min-height:44px}html.phone .lvl{flex:none}html.phone #panel{max-height:72vh!important;max-height:72dvh!important}html.phone #panel.full{max-height:none!important;top:0!important;height:100vh;height:100dvh;border-radius:0;padding-top:var(--sat)}html.phone #pfull{display:inline-block}html.phone #pop{max-height:58vh;max-height:58dvh;left:calc(6px + var(--sal))!important;right:calc(6px + var(--sar))}html.phone #fabs button{width:44px;height:44px}html.phone .res div,html.phone .list div.it,html.phone details summary{min-height:44px;display:flex;align-items:center;flex-wrap:wrap}html.phone .res div,html.phone .list div.it{display:block;padding:10px 8px}html.phone #panel{font-size:15px}html.phone .note,html.phone small,html.phone .sm{font-size:13px}html.n360 #sbtn .lab{display:none}html.n360 .lvl:before{display:none}html.n360 input[type=number]{width:44px}html.n360 #fabs{right:calc(6px + var(--sar));gap:6px}html.n360 #chainbar{max-width:calc(100vw - 70px);font-size:13px}html.n360 #pop{padding:0 10px 10px}html.n300 #cart{display:none!important}html.n300 #fabs button{width:44px;height:44px;font-size:18px}html.n300 #pop h3{font-size:15px}</style></head><body>
@@ -219,7 +262,7 @@ const coarse=matchMedia('(pointer:coarse)').matches;
 // which would flip every width check/media query to the desktop layout. screen.* stays in device points, so compare against it.
 let PZ=1,PHONE=false;function scrW(){const a=screen.width||0,b=screen.height||0;return innerWidth>innerHeight?Math.max(a,b):Math.min(a,b)}
 function detectPZ(){const sw=scrW(),mob=coarse||/iPhone|iPod|Android.*Mobile/.test(navigator.userAgent);PZ=(mob&&sw>0&&innerWidth>sw*1.12)?innerWidth/sw:1;const ew=innerWidth/PZ;PHONE=ew<700;
- const h=document.documentElement;h.classList.toggle('phone',PZ>1&&ew<700);h.classList.toggle('n360',PZ>1&&ew<=360);h.classList.toggle('n300',PZ>1&&ew<=300);h.classList.toggle('pz',PZ>1);h.style.setProperty('--pz',PZ.toFixed(3))}
+ const h=document.documentElement;h.classList.toggle('phone',PZ>1&&ew<700);h.classList.toggle('n360',PZ>1&&ew<=360);h.classList.toggle('n300',PZ>1&&ew<=300);h.classList.toggle('pz',PZ>1);const touch=coarse||PHONE||innerHeight/PZ<=500;h.classList.toggle('touch',touch);const lvI=document.getElementById('lv');if(lvI)lvI.placeholder=touch?'Lv':'–';h.style.setProperty('--pz',PZ.toFixed(3))}
 detectPZ();function NARROW(){return PHONE}
 let lastWH='',fitView='';const viewKey=()=>s.toFixed(5)+','+Math.round(tx)+','+Math.round(ty);
 let cur=0,s=1,tx=0,ty=0,dpr=Math.min(devicePixelRatio||1,2.5);
@@ -283,7 +326,7 @@ function minS(){return Math.min(0.04,(MAPS[cur].fitS||0.07)*0.6)}
 function maxS(){const m=MAPS[cur];const ts=m.tls||(m.tl?[m.tl]:[]);return ts.length?Math.max(3,1100/Math.min(...ts.map(t=>t.a))):3}
 function zoomAt(f,cx,cy){const ns=Math.max(minS(),Math.min(maxS(),s*f));tx=cx-(cx-tx)*ns/s;ty=cy-(cy-ty)*ns/s;s=ns;apply()}
 let anim=0;function zoomAnim(f,cx,cy){cancelAnimationFrame(anim);const s0=s,s1=Math.max(minS(),Math.min(maxS(),s*f)),t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/180),e=1-(1-k)*(1-k);zoomAt((s0+(s1-s0)*e)/s,cx,cy);if(k<1)anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
-function resize(){dpr=Math.min(devicePixelRatio||1,2.5);cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';bg.width=innerWidth*dpr;bg.height=innerHeight*dpr;bg.style.width=innerWidth+'px';bg.style.height=innerHeight+'px';placeUI();req()}
+function resize(){dpr=Math.min(devicePixelRatio||1,2.5);cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr);cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';bg.width=Math.round(innerWidth*dpr);bg.height=Math.round(innerHeight*dpr);bg.style.width=innerWidth+'px';bg.style.height=innerHeight+'px';placeUI();req()}
 // ---------- art tiers
 const ART={};window.ART_LOAD=(id,u)=>{ART[id]=u};let shownTier='',loadingT={};
 function loadArt(id,cb){if(ART[id]){cb();return}if(loadingT[id]){loadingT[id].push(cb);return}loadingT[id]=[cb];const sc=document.createElement('script');sc.src='art-'+id+'.js?v='+ASSETV;
