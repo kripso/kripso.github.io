@@ -94,6 +94,7 @@ details summary{cursor:pointer;color:#ffd77a;min-height:30px;display:flex;align-
  #pop{max-height:80vh}
  #fabs{flex-direction:row;flex-wrap:wrap;width:auto}
 }
+.nopin{color:#ffb35a;font-weight:700}
 </style></head><body>
 <div id="view"><div id="stage"><img id="img" alt=""><svg id="ov" xmlns="http://www.w3.org/2000/svg"><g id="zones"></g><g id="labels"></g></svg></div></div>
 <canvas id="cv"></canvas>
@@ -142,6 +143,7 @@ function save(){const c=Object.assign({},st);delete c.chain;try{localStorage.set
 const MK=Object.fromEntries(MAPS.map((m,i)=>[m.key,i]));
 QS.forEach((q,i)=>{q.ix=i;q.h=(q.n+' '+(q.gn||'')+' '+(q.dg||'')+' '+(q.ch&&CH[q.ch]?CH[q.ch].n:'')+' '+q.rw.map(r=>r.n).join(' ')+' '+q.cl.map(c=>CLN[c]).join(' ')+' '+KN[q.k]).toLowerCase()});
 const QBYID={};QS.forEach(q=>{(QBYID[q.i]=QBYID[q.i]||q)});
+const QCH={};Object.entries(CH).forEach(([c,v])=>v.ids.forEach(id=>(QCH[id]=QCH[id]||[]).push(c)));
 MAPS.forEach(m=>{m.qp=[];m.pins.forEach(p=>p.h=(p.n+' '+p.d+' '+(p.loot||[]).map(l=>l.n).join(' ')+' '+CC[p.c][1]).toLowerCase())});
 {const idx={};QS.forEach(q=>{if(!q.g)return;const mi=MK[q.g[0]];const k=mi+':'+Math.round(q.g[1])+':'+Math.round(q.g[2]);
  if(!idx[k]){idx[k]={x:q.g[1],y:q.g[2],n:q.g[3],z:q.g[4],note:q.g[5],qs:[],quest:1};MAPS[mi].qp.push(idx[k])}idx[k].qs.push(q.ix)})}
@@ -153,7 +155,7 @@ function qVis(q,ignoreCat){
  if(st.fac==='A'&&q.f==='H')return false;if(st.fac==='H'&&q.f==='A')return false;
  if(q.cl.length&&!q.cl.some(c=>st.classes.includes(c)))return false;
  if(!allCls()&&!q.cl.length&&q.k==='must'){const it=q.rw.filter(r=>r.u);if(it.length&&!it.some(r=>r.u.some(c=>st.classes.includes(c))))return false}
- if(st.chain)return q.ch===st.chain;
+ if(st.chain)return (QCH[q.i]||[]).includes(st.chain);
  if(st.dg)return q.dg===st.dg;
  if(!ignoreCat&&!st.cats['q-'+q.k])return false;
  const v=myLv();if(st.lvp&&!isNaN(v)&&q.lv&&((q.rl||q.lv-5)>v+3||q.lv<v-3))return false;
@@ -204,14 +206,23 @@ function draw(){const W=innerWidth,H=innerHeight;ctx.setTransform(dpr,0,0,dpr,0,
 }
 function chainsShown(){if(st.chain)return [st.chain];if(st.dg){const set=new Set();QS.forEach(q=>{if(q.dg===st.dg&&qVis(q))set.add(q.ch||('solo'+q.ix))});return [...set]}return []}
 function chainSteps(c){if(c.startsWith('solo'))return [QS[+c.slice(4)]];return (CH[c]?CH[c].ids:[]).map(id=>QBYID[id]).filter(Boolean)}
-function drawChains(P,r){const m=MAPS[cur];const R=Math.max(r,12.5);let hue=0;
- for(const c of chainsShown()){const steps=chainSteps(c);const col=st.chain?'#ffb35a':`hsl(${(hue+=47)%360},90%,62%)`;
-  const pts=[];steps.forEach((q,k)=>{if(q.g&&MK[q.g[0]]===cur&&qVis(q,true))pts.push([...P(q.g[1],q.g[2]),k+1,q.ix])});
-  const last=steps[steps.length-1];if(last&&qVis(last,true)&&last.t&&MK[last.t[0]]===cur)pts.push([...P(last.t[1],last.t[2]),'✓',last.ix]);
-  ctx.strokeStyle=col;ctx.lineWidth=3;ctx.setLineDash([8,6]);ctx.beginPath();pts.forEach((p,k)=>k?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();ctx.setLineDash([]);
-  const seen={};for(const p of pts){const key=Math.round(p[0])+':'+Math.round(p[1]);const off=(seen[key]=(seen[key]||0)+1)-1;const x=p[0]+off*R*1.6,y=p[1];
-   ctx.beginPath();ctx.arc(x,y,R,0,7);ctx.fillStyle=col;ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle=sel&&sel.t==='s'&&sel.i===p[3]?'#fff':'#120b05';ctx.stroke();
-   ctx.fillStyle='#120b05';ctx.font=`800 ${Math.round(R*1.1)}px FMNum,sans-serif`;ctx.fillText(String(p[2]),x,y+0.5);HITS.push({x,y,r:R,ref:{t:'s',i:p[3]}})}}}
+function stepOk(q){if(st.fac==='A'&&q.f==='H')return false;if(st.fac==='H'&&q.f==='A')return false;if(q.cl.length&&!q.cl.some(c=>st.classes.includes(c)))return false;return true}
+function chainView(c){const all=chainSteps(c),vis=all.filter(stepOk);return {all,vis,hidden:all.length-vis.length}}
+function arrow(x0,y0,x1,y1,col){const d=Math.hypot(x1-x0,y1-y0);if(d<4)return;const ux=(x1-x0)/d,uy=(y1-y0)/d,mx=(x0+x1)/2,my=(y0+y1)/2,L=Math.min(13,d*0.4);
+ ctx.beginPath();ctx.moveTo(mx+ux*L*0.6,my+uy*L*0.6);ctx.lineTo(mx-ux*L*0.6-uy*L*0.55,my-uy*L*0.6+ux*L*0.55);ctx.lineTo(mx-ux*L*0.6+uy*L*0.55,my-uy*L*0.6-ux*L*0.55);ctx.closePath();
+ ctx.fillStyle=col;ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle='#120b05';ctx.stroke()}
+function drawChains(P,r){const m=MAPS[cur];const R=Math.max(r,coarse?14:13);let hue=0;
+ for(const c of chainsShown()){const {vis}=chainView(c);const col=st.chain?'#ffb35a':`hsl(${(hue+=47)%360},90%,62%)`;
+  const pts=[];vis.forEach((q,k)=>{if(q.g&&MK[q.g[0]]===cur)pts.push({p:P(q.g[1],q.g[2]),lab:String(k+1),ix:q.ix})});
+  const last=vis[vis.length-1];if(last&&last.t&&MK[last.t[0]]===cur){const tp=P(last.t[1],last.t[2]);const lp=last.g&&MK[last.g[0]]===cur?P(last.g[1],last.g[2]):null;if(!lp||Math.hypot(tp[0]-lp[0],tp[1]-lp[1])>2)pts.push({p:tp,lab:'✓',ix:last.ix})}
+  // steps at the same spot sit side by side so every number stays visible and the path still runs 1→2→3
+  const cl=[];for(const o of pts){let g=cl.find(g=>Math.hypot(g.x-o.p[0],g.y-o.p[1])<R*1.6);if(!g)cl.push(g={x:o.p[0],y:o.p[1],n:0});o.x=g.x+g.n*R*2.05;o.y=g.y;g.n++}
+  ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.strokeStyle='#120b05';ctx.lineWidth=6.5;ctx.beginPath();pts.forEach((o,k)=>k?ctx.lineTo(o.x,o.y):ctx.moveTo(o.x,o.y));ctx.stroke();
+  ctx.strokeStyle=col;ctx.lineWidth=3.5;ctx.beginPath();pts.forEach((o,k)=>k?ctx.lineTo(o.x,o.y):ctx.moveTo(o.x,o.y));ctx.stroke();
+  for(let k=1;k<pts.length;k++){const a=pts[k-1],b=pts[k];const d=Math.hypot(b.x-a.x,b.y-a.y);if(d>2*R+10){const ux=(b.x-a.x)/d,uy=(b.y-a.y)/d;arrow(a.x+ux*R,a.y+uy*R,b.x-ux*R,b.y-uy*R,col)}}
+  for(const o of pts){const S=sel&&sel.t==='s'&&sel.i===o.ix;ctx.beginPath();ctx.arc(o.x,o.y,R,0,7);ctx.fillStyle=o.lab==='✓'?'#8dff9c':col;ctx.fill();ctx.lineWidth=S?3.5:2.5;ctx.strokeStyle=S?'#fff':'#120b05';ctx.stroke();
+   ctx.fillStyle='#120b05';ctx.font=`800 ${Math.round(R*(o.lab.length>1?0.95:1.15))}px FMNum,sans-serif`;ctx.fillText(o.lab,o.x,o.y+0.5);HITS.push({x:o.x,y:o.y,r:R,ref:{t:'s',i:o.ix}})}}}
 let sel=null;
 // ---------- hit testing & taps
 function hitAt(x,y){const tol=Math.max(22,pinR()+6);const out=HITS.map(h=>[Math.hypot(h.x-x,h.y-y),h]).filter(([d,h])=>d<=Math.max(tol,h.r+4)).sort((a,b)=>a[0]-b[0]);
@@ -238,14 +249,14 @@ function popPin(i,x,y){const p=MAPS[cur].pins[i],c=CC[p.c];
 function rewardsHtml(q){if(!q.rw.length)return '';const ch=q.rw.filter(r=>r.c),fx=q.rw.filter(r=>!r.c);
  const li=r=>{const good=r.u&&r.u.filter(c=>st.classes.includes(c));return `<li><span class="q${r.q}">${esc(r.n)}</span>${r.d?` <small>${esc(r.d)}</small>`:''}${r.s?`<br><small>${esc(r.s)}</small>`:''}${r.u?`<br><small>Good for: ${r.u.map(c=>`<span class="${st.classes.includes(c)&&!allCls()?'good':''}">${CLN[c]}</span>`).join(', ')||'—'}</small>`:''}</li>`};
  return (ch.length?`<div><b>Choose one:</b><ul class="rw">${ch.map(li).join('')}</ul></div>`:'')+(fx.length?`<div><b>You get:</b><ul class="rw">${fx.map(li).join('')}</ul></div>`:'')}
-function stepsHtml(c,curIx){const steps=chainSteps(c);return `<ol class="steps">${steps.map((s,k)=>`<li class="${s.ix===curIx?'cur':''}"><span class="no ${s.g?'':'off'}">${k+1}</span><div><b>${esc(s.n)}</b> <small>lv ${s.lv||'?'} · ${esc(FN[s.f])}</small><br><small>${s.g?`Start: ${esc(s.g[3])} · ${esc(s.g[4])}${s.g[5]?' ('+esc(s.g[5])+')':''}`:s.gn?`Start: ${esc(s.gn)} (location not recorded)`:'Start location not recorded'}${s.t?` → Turn in: ${esc(s.t[3])} · ${esc(s.t[4])}`:''}</small>${s.g?` <button class="link" data-go="${s.ix}">show</button>`:''}</div></li>`).join('')}</ol>`}
+function stepsHtml(c,curIx){const {vis,hidden,all}=chainView(c);const other=st.fac==='A'?'Horde-only':st.fac==='H'?'Alliance-only':'';return `<ol class="steps">${vis.map((s,k)=>`<li class="${s.ix===curIx?'cur':''}"><span class="no ${s.g?'':'off'}">${k+1}</span><div><b>${esc(s.n)}</b> <small>lv ${s.lv||'?'} · ${esc(FN[s.f])}</small><br><small>${s.g?`Start: ${esc(s.g[3])} · ${esc(s.g[4])}${s.g[5]?' ('+esc(s.g[5])+')':''}${MK[s.g[0]]!==cur?` · <i>on ${esc(MAPS[MK[s.g[0]]].title)}</i>`:''}`:`<span class="nopin">No map pin:</span> ${s.gn?`start NPC ${esc(s.gn)}, location not recorded`:'start location not recorded'}`}${s.t?` → Turn in: ${esc(s.t[3])} · ${esc(s.t[4])}`:''}</small>${s.g?` <button class="link" data-go="${s.ix}">show</button>`:''}</div></li>`).join('')}</ol>${hidden?`<div class="sm">${hidden} step${hidden>1?'s':''} hidden (${esc(other||'other class')} version${hidden>1?'s':''} of this chain). Change Faction / Classes to see them.</div>`:''}`}
 function questCard(q,full){const e=ENV[q.env];let h=`<div class="qc"><h4>${esc(q.n)}</h4><div>${badge(KN[q.k],CC['q-'+q.k][2])}${q.att?badge('Attunement / key','#ff9b3a'):''}${q.f!=='N'?badge(FN[q.f],q.f==='A'?'#2f6fd6':'#c03a2b','#fff'):''}${q.cl.map(c=>badge(CLN[c],CLC[c])).join('')}${e?badge(e[0],e[1]):''}</div>`;
  h+=`<div class="sm">Level ${q.lv||'?'}${q.rl?` · requires ${q.rl}`:''}${q.dg?` · for <b>${esc(q.dg)}</b>`:''}</div>`;
  if(q.desc)h+=`<div style="margin-top:3px">${esc(q.desc)}</div>`;
  if(q.el&&q.el.length)h+=`<div class="sm" style="color:#ffb35a">Forever change: ${q.el.map(esc).join('; ')}</div>`;
  h+=rewardsHtml(q);
  if(!q.g)h+=`<div class="sm">${q.gn?'Start NPC: '+esc(q.gn)+' — ':''}start location not recorded yet, so no pin.</div>`;
- if(q.ch&&CH[q.ch]){const c=CH[q.ch];const n=c.ids.length,k=c.ids.indexOf(q.i)+1;h+=`<details ${full?'open':''}><summary>Chain: ${esc(c.n)} — step ${k} of ${n}</summary>${stepsHtml(q.ch,q.ix)}</details><button class="btn" data-chain="${esc(q.ch)}">Show whole chain on map</button>`}
+ for(const c0 of [...new Set([q.ch,...(QCH[q.i]||[])])].filter(c=>c&&CH[c])){const c=CH[c0];const v=chainView(c0).vis;const n=v.length,k=v.findIndex(x=>x.i===q.i)+1;h+=`<details ${full?'open':''}><summary>Chain: ${esc(c.n)} — ${k?`step ${k} of ${n}`:`${n} steps`}</summary>${stepsHtml(c0,q.ix)}</details><button class="btn" data-chain="${esc(c0)}">Show whole chain on map</button>`}
  h+=`<div class="src">Source: ${esc(q.src)} · <a href="https://www.wowhead.com/forever/quest=${q.i}" target="_blank" rel="noopener">Wowhead</a></div></div>`;return h}
 function wirePop(){pop.querySelectorAll('[data-chain]').forEach(b=>b.onclick=()=>setChain(b.dataset.chain));pop.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goQuest(+b.dataset.go))}
 function popNpc(i,x,y){const p=MAPS[cur].qp[i];const qs=p.qs.map(j=>QS[j]);const vis=qs.filter(q=>qVis(q)),rest=qs.filter(q=>!qVis(q));
@@ -257,14 +268,18 @@ function goQuest(ix){const q=QS[ix];if(!q.g){popQuest(ix);return}if(innerWidth<7
  if(!qVis(q)&&!st.chain&&!st.dg){st.cats['q-'+q.k]=true;syncUI()}
  centerOn(MK[q.g[0]],q.g[1],q.g[2],(x,y)=>{if(st.chain||st.dg){sel={t:'s',i:ix};req();popQuest(ix,x,y)}else{const mi=MAPS[cur].qp.findIndex(p=>p.qs.includes(ix));if(mi>=0){sel={t:'q',i:mi};req();popNpc(mi,x,y)}else popQuest(ix,x,y)}})}
 // ---------- chain / dungeon modes
-function setChain(c){st.chain=c;st.dg='';closePop();syncUI();const steps=chainSteps(c).filter(q=>q.g);
- $('chainbar').innerHTML=`<span>Chain: <b>${esc(CH[c]?CH[c].n:'')}</b> · ${chainSteps(c).length} steps${steps.some(q=>MK[q.g[0]]!==cur)?' · <button class="link" id="cbswap">steps on other map</button>':''}</span><button class="btn" id="cbx">✕</button>`;
- $('chainbar').style.display='flex';$('cbx').onclick=()=>{st.chain=null;$('chainbar').style.display='none';syncUI();draw()};
- const sw=$('cbswap');if(sw)sw.onclick=()=>{const o=steps.find(q=>MK[q.g[0]]!==cur);show(MK[o.g[0]]);fitPts(steps)};
- const here=steps.filter(q=>MK[q.g[0]]===cur);if(!here.length&&steps.length)show(MK[steps[0].g[0]]);fitPts(steps);if(innerWidth<700)panel.classList.remove('open')}
-function fitPts(steps){const pts=steps.filter(q=>MK[q.g[0]]===cur).map(q=>[q.g[1],q.g[2]]);if(!pts.length)return draw();const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
- const top=bh()+50,bot=innerWidth<700?innerHeight*0.42:60;const w=Math.max(200,Math.max(...xs)-Math.min(...xs)),h=Math.max(200,Math.max(...ys)-Math.min(...ys));
- s=Math.min(1.2,Math.min((innerWidth-(innerWidth<700?40:420))/w,(innerHeight-top-bot)/h)*0.85);tx=(innerWidth<700?innerWidth/2:(innerWidth-360)/2)-(Math.min(...xs)+w/2)*s;ty=top+(innerHeight-top-bot)/2-(Math.min(...ys)+h/2)*s;apply();draw()}
+function setChain(c,keep){st.chain=c;st.dg='';closePop();syncUI();const {vis,hidden}=chainView(c);const steps=vis.filter(q=>q.g);
+ const np=vis.length-steps.length,om=steps.filter(q=>MK[q.g[0]]!==cur).length;
+ $('chainbar').innerHTML=`<span>Chain: <b>${esc(CH[c]?CH[c].n:'')}</b> · ${vis.length} step${vis.length===1?'':'s'}${np?` · ${np} without pin`:''}${hidden?` · ${hidden} hidden`:''}${om?' · <button class="link" id="cbswap">steps on other map</button>':''} · <button class="link" id="cblist">list</button></span><button class="btn" id="cbx" aria-label="Close chain">✕</button>`;
+ $('chainbar').style.display='flex';$('cbx').onclick=()=>{st.chain=null;$('chainbar').style.display='none';closePop();syncUI();draw()};
+ $('cblist').onclick=()=>{showPop(`<h3>${esc(CH[c].n)}</h3><div class="sm">Numbered markers on the map follow this order; ✓ = final turn-in.</div>${stepsHtml(c)}`);wirePop()};
+ const sw=$('cbswap');if(sw)sw.onclick=()=>{const o=steps.find(q=>MK[q.g[0]]!==cur);show(MK[o.g[0]]);setChain(c,1)};
+ if(!keep&&steps.length&&MK[steps[0].g[0]]!==cur){show(MK[steps[0].g[0]]);return setChain(c,1)}fitPts(steps.concat(vis.length&&vis[vis.length-1].t?[{g:vis[vis.length-1].t}]:[]));if(innerWidth<700)panel.classList.remove('open')}
+function fitPts(steps){const pts=steps.filter(q=>q.g&&MK[q.g[0]]===cur).map(q=>[q.g[1],q.g[2]]);if(!pts.length)return draw();const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+ const cb=$('chainbar'),cbb=cb.style.display==='flex'?cb.getBoundingClientRect().bottom:bh();const top=Math.max(bh(),cbb)+34,bot=innerWidth<700?Math.max(70,innerHeight*0.1):60;
+ const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);const w=Math.max(120,x1-x0),h=Math.max(120,y1-y0);
+ const L=innerWidth<700?20:0,R=innerWidth<700?20:(panel.classList.contains('open')?400:60);
+ s=Math.min(1.6,Math.min((innerWidth-L-R)/w,(innerHeight-top-bot)/h)*0.85);tx=L+(innerWidth-L-R)/2-(x0+x1)/2*s;ty=top+(innerHeight-top-bot)/2-(y0+y1)/2*s;apply();draw()}
 function setDg(d){st.dg=d;st.chain=null;$('chainbar').style.display='none';closePop();save();syncUI();const qs=QS.filter(q=>q.dg===d&&q.g&&qVis(q));
  if(qs.length){const cnt={};qs.forEach(q=>cnt[MK[q.g[0]]]=(cnt[MK[q.g[0]]]||0)+1);const best=+Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];if(best!==cur)show(best);fitPts(qs)}else draw();
  panel.classList.add('open');document.getElementById('dgbox').scrollIntoView({block:'start'})}
@@ -313,7 +328,7 @@ function show(i){cur=i;st.map=i;save();const m=MAPS[i];closePop();shownTier='';i
  loadArt(m.key+'-lite',()=>{setArt(m.key,'lite');upgrade()});
  ov.setAttribute('viewBox',`0 0 ${m.W} ${m.H}`);ov.setAttribute('width',m.W);ov.setAttribute('height',m.H);gz.innerHTML=m.svg;gl.innerHTML=m.labels;
  document.querySelectorAll('#tabs button').forEach((b,j)=>b.classList.toggle('on',j===i));fit();level();req()}
-MAPS.forEach((m,i)=>{const b=document.createElement('button');b.textContent=m.title;b.onclick=()=>{show(i);if(st.chain)setChain(st.chain)};$('tabs').append(b)});
+MAPS.forEach((m,i)=>{const b=document.createElement('button');b.textContent=m.title;b.onclick=()=>{show(i);if(st.chain)setChain(st.chain,1)};$('tabs').append(b)});
 // ---------- pointer handling: pan, pinch, tap, double tap
 const pts=new Map();let last=null,down=null,lastTap=null,tapT=0,moved=false;
 view.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;view.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
