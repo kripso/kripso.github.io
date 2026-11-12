@@ -208,6 +208,39 @@ html.touch #bar #city{-webkit-appearance:none;appearance:none;background-color:r
  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23ffd77a' stroke-width='1.6'/%3E%3C/svg%3E");
  background-repeat:no-repeat;background-position:right 9px center;background-size:10px 6px}
 html.touch #bar #city option{background:#2a1f14;color:#f3e7c9}
+/* ===== v11: much smaller touch chrome — 32px pill, 28px controls inside, 30px map buttons, 6px edge margins */
+html.touch{--chiph:28px}
+html.touch #bar{left:calc(6px + var(--sal));top:calc(6px + var(--sat));padding:2px!important;gap:3px;border:0;border-radius:10px;
+ box-shadow:0 0 0 1px var(--chipb),0 2px 10px rgba(0,0,0,.45);max-width:calc(100% - 12px - var(--sal) - var(--sar))}
+html.touch #bar #sbtn{width:28px;height:28px;border-radius:8px;font-size:15px}
+html.touch #bar #city{height:28px!important;width:140px!important;min-width:0!important;max-width:min(40vw,150px)!important;
+ font:600 16px/28px 'FMNum',sans-serif!important;padding:0 20px 0 8px!important;border-radius:8px;background-position:right 7px center;background-size:9px 5px}
+html.touch #bar #lv{width:36px!important;height:28px!important;padding:0 2px!important;border-radius:8px;font:700 16px/28px 'FMNum',sans-serif!important}
+html.touch #bar .tbtn:not(#sbtn){height:28px;padding:0 6px!important;font-size:12px!important;border-radius:8px}
+html.touch #fabs{right:calc(6px + var(--sar))!important;bottom:calc(8px + var(--sab))!important}
+html.touch #fabs button{width:30px!important;height:30px!important;font-size:15px}
+html.touch #fabs button::after{inset:-6px}
+html.touch #fabs #fbtn{border-radius:8px;margin-bottom:6px;font-size:15px}
+html.touch #fabs #zin{border-radius:8px 8px 0 0}html.touch #fabs #fit{border-radius:0 0 8px 8px;font-size:13px}
+html.touch #zoomhint{right:calc(44px + var(--sar));bottom:calc(8px + var(--sab));font-size:12px}
+html.touch #chainbar{top:calc(44px + var(--sat))}
+/* Safari page zoom-in compensation (only the floating chrome) */
+html.pzi #bar,html.pzi #fabs,html.pzi #zoomhint{zoom:var(--pzi)}
+/* short screens (landscape phones): tighter sheet header, chips, headings */
+@media (max-height:500px){
+ html.touch #phead{padding:4px 0!important;min-height:0}
+ html.touch #phead b{font-size:13px}
+ html.touch #phead .x,html.touch #panel .ph .x,html.touch #pop .ph .x{min-width:32px!important;min-height:32px!important;width:32px;height:32px;font-size:16px}
+ html.touch #panel{font-size:13px;padding-left:calc(10px + var(--sal));padding-right:calc(10px + var(--sar))}
+ html.touch #panel h2{font-size:12.5px;margin:8px 0 4px}
+ html.touch .chip{min-height:28px!important;padding:3px 9px;font-size:12px;border-radius:14px}
+ html.touch .chips{gap:4px}
+ html.touch #panel input:not([type=checkbox]):not([type=radio]),html.touch #panel select{min-height:32px!important;height:32px;padding:0 8px}
+ html.touch #panel .list>*,html.touch #res>*{min-height:34px!important}
+ html.touch .grab{display:none}
+}
+html.touch #bar #lv,html.touch #bar #city,html.touch #bar #sbtn{box-sizing:border-box}
+html.touch #panel select{-webkit-appearance:none;appearance:none;background:#2a1f14 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23ffd77a' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 9px center/10px 6px;color:#f3e7c9;border:1px solid #6b5130;border-radius:8px;padding-right:24px}
 
 /* forced phone layout (page zoom) */
 html.phone #bar{gap:5px 6px}html.phone #bar h1{font-size:13px;width:100%}html.phone .tabs button{padding:4px 8px;font-size:13px}html.phone .lvl .t{display:none}html.phone .lvl:before{content:'Lv';font-size:13px}html.phone input[type=number]{width:46px}html.phone #panel{left:0;right:0;bottom:0;top:auto!important;width:auto;max-width:none;max-height:72vh!important;border-radius:16px 16px 0 0;border-width:1px 0 0;padding:0 calc(12px + var(--sar)) calc(14px + var(--sab)) calc(12px + var(--sal));display:block;transform:translateY(105%);transition:transform .22s ease}html.phone #panel.open{transform:none}html.phone .grab{display:block;width:44px;height:5px;border-radius:3px;background:#6b5130;margin:0 auto}html.phone #phead{flex-wrap:wrap}html.phone #pop{left:8px!important;right:8px;top:auto!important;bottom:calc(8px + var(--sab));width:auto;max-height:58vh}html.phone #tip{display:none!important}html.phone #city,html.phone .tbtn{font-size:13px;padding:4px 6px;max-width:118px}html.phone #bar{flex-wrap:nowrap;gap:6px;padding:calc(4px + var(--sat)) calc(8px + var(--sar)) 4px calc(8px + var(--sal))}html.phone #bar h1{display:none}html.phone #sbtn{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:20px;padding:0 10px;flex:none}html.phone #sbtn .lab{font-size:14px}html.phone #city{flex:1 1 auto;min-width:0;max-width:none;min-height:44px;font-size:16px!important}html.phone .tbtn{min-height:44px}html.phone input[type=number]{width:52px;min-height:44px}html.phone .lvl{flex:none}html.phone #panel{max-height:72vh!important;max-height:72dvh!important}html.phone #panel.full{max-height:none!important;top:0!important;height:100vh;height:100dvh;border-radius:0;padding-top:var(--sat)}html.phone #pfull{display:inline-block}html.phone #pop{max-height:58vh;max-height:58dvh;left:calc(6px + var(--sal))!important;right:calc(6px + var(--sar))}html.phone #fabs button{width:44px;height:44px}html.phone .res div,html.phone .list div.it,html.phone details summary{min-height:44px;display:flex;align-items:center;flex-wrap:wrap}html.phone .res div,html.phone .list div.it{display:block;padding:10px 8px}html.phone #panel{font-size:15px}html.phone .note,html.phone small,html.phone .sm{font-size:13px}html.n360 #sbtn .lab{display:none}html.n360 .lvl:before{display:none}html.n360 input[type=number]{width:44px}html.n360 #fabs{right:calc(6px + var(--sar));gap:6px}html.n360 #chainbar{max-width:calc(100vw - 70px);font-size:13px}html.n360 #pop{padding:0 10px 10px}html.n300 #cart{display:none!important}html.n300 #fabs button{width:44px;height:44px;font-size:18px}html.n300 #pop h3{font-size:15px}</style></head><body>
@@ -261,8 +294,10 @@ const coarse=matchMedia('(pointer:coarse)').matches;
 // Phone detection that survives Safari's per-site "Page Zoom" (aA menu): at 50% page zoom a 375pt iPhone reports innerWidth 750,
 // which would flip every width check/media query to the desktop layout. screen.* stays in device points, so compare against it.
 let PZ=1,PHONE=false;function scrW(){const a=screen.width||0,b=screen.height||0;return innerWidth>innerHeight?Math.max(a,b):Math.min(a,b)}
-function detectPZ(){const sw=scrW(),mob=coarse||/iPhone|iPod|Android.*Mobile/.test(navigator.userAgent);PZ=(mob&&sw>0&&innerWidth>sw*1.12)?innerWidth/sw:1;const ew=innerWidth/PZ;PHONE=ew<700;
- const h=document.documentElement;h.classList.toggle('phone',PZ>1&&ew<700);h.classList.toggle('n360',PZ>1&&ew<=360);h.classList.toggle('n300',PZ>1&&ew<=300);h.classList.toggle('pz',PZ>1);const touch=coarse||PHONE||innerHeight/PZ<=500;h.classList.toggle('touch',touch);const lvI=document.getElementById('lv');if(lvI)lvI.placeholder=touch?'Lv':'–';h.style.setProperty('--pz',PZ.toFixed(3))}
+function detectPZ(){const sw=scrW(),mob=coarse||/iPhone|iPod|Android.*Mobile/.test(navigator.userAgent);PZ=(mob&&sw>0&&innerWidth>sw*1.12)?innerWidth/sw:1;
+ // Safari page zoom IN (aA 115%+) on iPhone: CSS viewport narrower than the screen; shrink the floating chrome back to its designed size
+ const zin=/iPhone|iPod/.test(navigator.userAgent)&&sw>0&&innerWidth<sw*0.88?Math.max(0.5,innerWidth/sw):1;const ew=innerWidth/PZ;PHONE=ew<700;
+ const h=document.documentElement;h.classList.toggle('phone',PZ>1&&ew<700);h.classList.toggle('n360',PZ>1&&ew<=360);h.classList.toggle('n300',PZ>1&&ew<=300);h.classList.toggle('pz',PZ>1);h.classList.toggle('pzi',zin<1);h.style.setProperty('--pzi',zin.toFixed(3));window.PZI=zin;const touch=coarse||PHONE||innerHeight/PZ<=500;h.classList.toggle('touch',touch);const lvI=document.getElementById('lv');if(lvI)lvI.placeholder=touch?'Lv':'–';h.style.setProperty('--pz',PZ.toFixed(3))}
 detectPZ();function NARROW(){return PHONE}
 let lastWH='',fitView='';const viewKey=()=>s.toFixed(5)+','+Math.round(tx)+','+Math.round(ty);
 let cur=0,s=1,tx=0,ty=0,dpr=Math.min(devicePixelRatio||1,2.5);
@@ -652,7 +687,7 @@ if(window.visualViewport)visualViewport.addEventListener('resize',()=>relayoutSo
 if(window.ResizeObserver)new ResizeObserver(()=>relayoutSoon('ro')).observe(document.getElementById('bar'));
 addEventListener('pageshow',e=>{if(e.persisted)relayout('force')});
 resize();
-{const zh=$('zoomhint');const upd=()=>{const on=PZ>1.12&&!sessionStorage.getItem('pzok');zh.style.display=on?'flex':'none';if(on)$('zhp').textContent=Math.round(100/PZ)+'%'};upd();$('zhx').onclick=()=>{sessionStorage.setItem('pzok','1');upd()};addEventListener('resize',()=>setTimeout(upd,200))}
+{const zh=$('zoomhint');const upd=()=>{const z=PZ>1.12?PZ:(window.PZI<0.88?window.PZI:1);const on=z!==1&&!sessionStorage.getItem('pzok');zh.style.display=on?'flex':'none';if(on)$('zhp').textContent=Math.round(100/z)+'%'};upd();$('zhx').onclick=()=>{sessionStorage.setItem('pzok','1');upd()};addEventListener('resize',()=>setTimeout(upd,200))}
 syncUI();show(Math.min(st.map||0,MAPS.length-1));
 lastWH=innerWidth+'x'+innerHeight+'/'+bh()+'/'+PHONE;
 {const settle=()=>relayout('settle');requestAnimationFrame(()=>requestAnimationFrame(settle));setTimeout(settle,300);setTimeout(settle,1000);addEventListener('load',settle);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(settle)}
